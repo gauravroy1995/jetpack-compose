@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -24,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -64,6 +66,7 @@ fun RenderTextInput(billString:String, onValueChangeNew:(String)->Unit, modifier
         onValueChange = onValueChangeNew ,
         singleLine = true,
         label = { Text("Total Amount") },
+        leadingIcon = { Icon(painter = painterResource(id = R.drawable.money), contentDescription = null)},
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = modifier
     )
@@ -76,6 +79,7 @@ fun RenderTipPercent(billString:String, onValueChangeNew:(String)->Unit, modifie
         value = billString,
         onValueChange = onValueChangeNew ,
         singleLine = true,
+        leadingIcon = { Icon(painter = painterResource(id = R.drawable.tip), contentDescription = null)},
         label = { Text("Tip Percent") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = modifier
@@ -83,7 +87,9 @@ fun RenderTipPercent(billString:String, onValueChangeNew:(String)->Unit, modifie
 }
 
 @Composable
-fun RenderSwitch(round:Boolean, onValueChangeNew:(Boolean)->Unit, modifier: Modifier = Modifier.padding(top = 10.dp, start = 60.dp, end = 60.dp).fillMaxWidth()){
+fun RenderSwitch(round:Boolean, onValueChangeNew:(Boolean)->Unit, modifier: Modifier = Modifier
+    .padding(top = 10.dp, start = 60.dp, end = 60.dp)
+    .fillMaxWidth()){
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier =modifier ){
         Text("Round off")
         Switch(checked = round, onCheckedChange =onValueChangeNew)
