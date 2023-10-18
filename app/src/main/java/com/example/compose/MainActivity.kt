@@ -4,10 +4,12 @@ package com.example.compose
 
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,13 +25,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -132,32 +133,46 @@ fun RenderButtons(currIndex: Int = 0, onNextPress: () -> Unit, onPrevPress: () -
 fun RenderGreeting() {
 
     var (currIndex, setCurrIndex) = remember { mutableStateOf(0) }
-    var swipePerformed by remember { mutableStateOf(false) }
+
 
     var currData: MyItem = myMutableObjectList[currIndex]
 
 
     fun onNextPress() {
         if (currIndex < myMutableObjectList.size - 1) {
+            Log.d("Gaurav drag press cuteee","press ${currIndex}")
             setCurrIndex(currIndex + 1)
 
         }
     }
 
     fun onPrevPress() {
+        Log.d("Gaurav drag press","press")
         if (currIndex > 0) {
+            Log.d("Gaurav drag press nowww","press")
             setCurrIndex(currIndex - 1)
         }
     }
 
-    val offsetX = remember { mutableStateOf(0f) }
-    var width by remember { mutableStateOf(0f) }
 
 
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().pointerInput(Unit) {
+            var totalDrag = 0f
+            detectHorizontalDragGestures(onHorizontalDrag = {change, dragAmount -> totalDrag+= dragAmount},
+                onDragStart = {}, onDragEnd = {
+                    if(totalDrag > 0) {
+                        onNextPress()
+                    } else {
+                        onPrevPress()
+                    }
+//                    totalDrag = 0f
+                    Log.d("Gaurav drag", "onDragEnd: $totalDrag")
+
+                }, onDragCancel = {})
+        }
     ) {
         RenderThings(currData)
         RenderButtons(currIndex, {
