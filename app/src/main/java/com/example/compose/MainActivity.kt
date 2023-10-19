@@ -25,8 +25,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -132,7 +134,7 @@ fun RenderButtons(currIndex: Int = 0, onNextPress: () -> Unit, onPrevPress: () -
 @Composable
 fun RenderGreeting() {
 
-    var (currIndex, setCurrIndex) = remember { mutableStateOf(0) }
+    var currIndex by remember { mutableStateOf(0) }
 
 
     var currData: MyItem = myMutableObjectList[currIndex]
@@ -141,7 +143,7 @@ fun RenderGreeting() {
     fun onNextPress() {
         if (currIndex < myMutableObjectList.size - 1) {
             Log.d("Gaurav drag press cuteee","press ${currIndex}")
-            setCurrIndex(currIndex + 1)
+            currIndex += 1
 
         }
     }
@@ -150,7 +152,7 @@ fun RenderGreeting() {
         Log.d("Gaurav drag press","press")
         if (currIndex > 0) {
             Log.d("Gaurav drag press nowww","press")
-            setCurrIndex(currIndex - 1)
+currIndex -= 1
         }
     }
 
