@@ -145,6 +145,7 @@ fun RenderGreeting() {
             Log.d("Gaurav drag press cuteee","press ${currIndex}")
             currIndex += 1
 
+
         }
     }
 
@@ -164,11 +165,13 @@ currIndex -= 1
         modifier = Modifier.fillMaxSize().pointerInput(Unit) {
             var totalDrag = 0f
             detectHorizontalDragGestures(onHorizontalDrag = {change, dragAmount -> totalDrag+= dragAmount},
-                onDragStart = {}, onDragEnd = {
+                onDragStart = {
+                              totalDrag = 0f
+                }, onDragEnd = {
                     if(totalDrag > 0) {
-                        onNextPress()
-                    } else {
                         onPrevPress()
+                    } else {
+                        onNextPress()
                     }
 //                    totalDrag = 0f
                     Log.d("Gaurav drag", "onDragEnd: $totalDrag")
