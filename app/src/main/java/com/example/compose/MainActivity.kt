@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.compose.ui.screen.CupcakeApp
-import com.example.compose.ui.screen.GameScreen
 import com.example.compose.ui.theme.ComposeTheme
 
 
@@ -38,7 +37,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
 
                 ) {
-                    GameScreen()
+                    CupcakeApp()
                 }
             }
         }
