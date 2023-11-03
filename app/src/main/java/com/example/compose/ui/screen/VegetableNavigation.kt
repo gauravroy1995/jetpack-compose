@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -27,16 +26,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.R
-import com.example.compose.ui.viewmodel.OrderViewModel
+import com.example.compose.ui.viewmodel.VegetableViewModel
 
 
-enum class CupcakeScreen(@StringRes val title: Int) {
+enum class VegetableScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
-    Flavor(title = R.string.choose_flavor),
-    Pickup(title = R.string.choose_pickup_date),
-    Summary(title = R.string.order_summary)
+    Entree(title = R.string.new_cupcake_order),
+    Sides(title = R.string.choose_flavor),
+    Accompany(title = R.string.choose_pickup_date),
+    Checkout(title = R.string.order_summary),
+    Vegetables(title = R.string.vegetables)
 }
-
 
 
 /**
@@ -44,8 +44,8 @@ enum class CupcakeScreen(@StringRes val title: Int) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CupcakeAppBar(
-    currentScreen: CupcakeScreen,
+fun VegetableAppBar(
+    currentScreen: VegetableScreen,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
@@ -73,19 +73,20 @@ fun CupcakeAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CupcakeApp(
-    viewModel: OrderViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+fun VegetableApp(
+    viewModel: VegetableViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
 
+    // to get the current screen from the back stack
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = CupcakeScreen.valueOf(
-        backStackEntry?.destination?.route ?: CupcakeScreen.Start.name
+    val currentScreen = VegetableScreen.valueOf(
+        backStackEntry?.destination?.route ?: VegetableScreen.Start.name
     )
 
     Scaffold(
         topBar = {
-            CupcakeAppBar(
+            VegetableAppBar(
                 currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() }
@@ -96,57 +97,56 @@ fun CupcakeApp(
 
         NavHost(
             navController = navController,
-            startDestination =CupcakeScreen.Start.name,
+            startDestination = VegetableScreen.Start.name,
             modifier = Modifier.padding(innerPadding)
-        ){
-//            composable(route = CupcakeScreen.Start.name) {
-//                StartOrderScreen(
-//                    quantityOptions = DataSource.quantityOptions,
-//                    onNextButtonClicked = {
-//                        viewModel.setQuantity(it)
-//                        navController.navigate(CupcakeScreen.Flavor.name)
-//                    }
-//
-//                )
-//            }
-//            composable(route = CupcakeScreen.Flavor.name) {
-//                val context = LocalContext.current
-//                SelectOptionScreen(
-//                    subtotal = uiState.price,
-//                    options = DataSource.flavors.map { id -> context.resources.getString(id) },
-//                    onNextButtonClicked = { navController.navigate(CupcakeScreen.Pickup.name) },
-//                    onSelectionChanged = { viewModel.setFlavor(it) },
-//                    onCancelButtonClicked = {
-//                        cancelOrderAndNavigateToStart(viewModel, navController)
-//                    },
-//                )
-//            }
-            composable(route = CupcakeScreen.Pickup.name) {
-                SelectOptionScreen(
-                    subtotal = uiState.price,
-                    options = uiState.pickupOptions,
-                    onSelectionChanged = { viewModel.setDate(it) },
-                    onNextButtonClicked = { navController.navigate(CupcakeScreen.Summary.name) },
-                    onCancelButtonClicked = {
-                        cancelOrderAndNavigateToStart(viewModel, navController)
-                    },
-
+        ) {
+            composable(route = VegetableScreen.Start.name) {
+                StartScreen(
+                    onClick = { navController.navigate(VegetableScreen.Entree.name) }
                 )
+
             }
 
-            composable(route = CupcakeScreen.Summary.name) {
-                val context = LocalContext.current
-                OrderSummaryScreen(
-
-                    orderUiState = uiState,
-                    onCancelButtonClicked = {
-                        cancelOrderAndNavigateToStart(viewModel, navController)
-                    },
-                    onSendButtonClicked = { subject: String, summary: String ->
-                        shareOrder(context, subject = subject, summary = summary)
-                    },
+            composable(route = VegetableScreen.Vegetables.name) {
+                VegetableScreen(
+                    viewModel = viewModel,
+                    onNextClick = { navController.navigate(VegetableScreen.Accompany.name) } ,
+                    onCancelClick = {
+                        cancelOrderAndNavigateToStart(
+                            viewModel,
+                            navController
+                        )
+                    }
                 )
+
             }
+
+            composable(route = VegetableScreen.Entree.name) {
+                Entree(
+                    viewModel = viewModel,
+                    onNextClick = {  navController.navigate(VegetableScreen.Vegetables.name) },
+                    onCancelClick = { cancelOrderAndNavigateToStart(viewModel, navController) }
+                )
+
+            }
+
+            composable(route = VegetableScreen.Accompany.name) {
+                FinalAccompany(
+                    viewModel = viewModel,
+                    onNextClick = {  navController.navigate(VegetableScreen.Checkout.name) },
+                    onCancelClick = { cancelOrderAndNavigateToStart(viewModel, navController) }
+                )
+
+            }
+
+            composable(route = VegetableScreen.Checkout.name) {
+                Checkout(
+                    viewModel = viewModel,
+                )
+
+            }
+
+
         }
 
     }
@@ -171,9 +171,10 @@ private fun shareOrder(context: Context, subject: String, summary: String) {
 }
 
 
-
-private fun cancelOrderAndNavigateToStart(viewModel: OrderViewModel,
-                                          navController: NavHostController) {
+private fun cancelOrderAndNavigateToStart(
+    viewModel: VegetableViewModel,
+    navController: NavHostController
+) {
     viewModel.resetOrder()
-    navController.popBackStack(CupcakeScreen.Start.name, inclusive = false)
+    navController.popBackStack(VegetableScreen.Start.name, inclusive = false)
 }

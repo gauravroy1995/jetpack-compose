@@ -13,16 +13,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.compose.ui.screen.CupcakeApp
+import com.example.compose.ui.screen.VegetableApp
 import com.example.compose.ui.theme.ComposeTheme
-
-
-
-
-
-
-
-
 
 
 class MainActivity : ComponentActivity() {
@@ -36,8 +28,8 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
 
-                ) {
-                    CupcakeApp()
+                    ) {
+                    VegetableApp()
                 }
             }
         }
@@ -67,17 +59,10 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
-
-
-
-
-
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun GreetingPreview() {
     ComposeTheme() {
-        CupcakeApp()
+        VegetableApp()
     }
 }
