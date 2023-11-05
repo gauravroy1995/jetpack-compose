@@ -18,34 +18,24 @@ package com.example.compose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.compose.ui.ReplyApp
-import com.example.compose.ui.theme.ReplyTheme
-
+import androidx.compose.ui.Modifier
+import com.example.compose.ui.RaceTrackerApp
+import com.example.compose.ui.theme.RaceTrackerTheme
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
-            ReplyTheme {
-                Surface {
-                    ReplyApp()
+            RaceTrackerTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    RaceTrackerApp()
                 }
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ReplyTheme {
-        Surface {
-            ReplyApp()
         }
     }
 }
