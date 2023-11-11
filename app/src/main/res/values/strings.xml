@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GiftJetpack</string>
+    <string name="let_s_quiz">Let\'s Quiz</string>
+    <string name="result">Result</string>
+</resources>
