@@ -29,7 +29,7 @@ import com.example.giftjetpack.ui.viewModel.QuizkViewModel
 
 
 enum class QuizClassScreensEnum(@StringRes val title: Int) {
-    Start(title = R.string.app_name),
+    Start(title = R.string.puchu_s_testing_time),
     QuizScreen(title = R.string.let_s_quiz),
     Result(title = (R.string.result)),
 }
@@ -47,15 +47,24 @@ fun VegetableAppBar(
     modifier: Modifier = Modifier
 ) {
 
+    @Composable
+    fun getTitle(): String {
+
+        if(currentScreen == QuizClassScreensEnum.Result){
+            return "You do LOVE ME"
+        }
+
+        return stringResource(currentScreen.title)
+    }
 
     TopAppBar(
-        title = { Text(stringResource(currentScreen.title)) },
+        title = { Text( text = getTitle()) },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         modifier = modifier,
         navigationIcon = {
-            if (canNavigateBack) {
+            if (canNavigateBack && currentScreen != QuizClassScreensEnum.Result) {
                 IconButton(onClick = navigateUp) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
@@ -104,7 +113,11 @@ fun QuizNavigation(
             }
 
             composable(route = QuizClassScreensEnum.QuizScreen.name){
-                QuizScreen(viewModel = viewModel,onFinish={cancelOrderAndNavigateToStart(viewModel,navController)})
+                QuizScreen(viewModel = viewModel,onFinish={navController.navigate(QuizClassScreensEnum.Result.name)})
+            }
+
+            composable(route = QuizClassScreensEnum.Result.name){
+                FinalResult()
             }
 
 //            composable(route = VegetableScreen.Vegetables.name) {

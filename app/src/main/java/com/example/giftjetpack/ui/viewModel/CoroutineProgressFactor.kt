@@ -30,7 +30,9 @@ class RaceParticipant(
     val maxProgress: Int = 100,
     val progressDelayMillis: Long = 500L,
     private val progressIncrement: Int = 1,
-    private val initialProgress: Int = 0
+    private val initialProgress: Int = 0,
+    private val initialDelay: Long = 0L,
+    private val onRaceFinish: () -> Unit = {}
 ) {
     init {
         require(maxProgress > 0) { "maxProgress=$maxProgress; must be > 0" }
@@ -48,13 +50,13 @@ class RaceParticipant(
 
 
     suspend fun run() {
-
+        delay(initialDelay)
         try {
             while (currentProgress < maxProgress) {
-
                 delay(progressDelayMillis)
                 currentProgress += progressIncrement
             }
+            onRaceFinish()
         } catch (e: CancellationException) {
             Log.e("RaceParticipant", " ${e.message}")
             throw e // Always re-throw CancellationException.
