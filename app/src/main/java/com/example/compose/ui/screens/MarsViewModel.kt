@@ -15,6 +15,7 @@
  */
 package com.example.compose.ui.screens
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,42 +25,65 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.compose.MarsPhotosApplication
-import com.example.compose.data.MarsPhotosRepository
-import com.example.compose.network.MarsPhoto
+import com.example.compose.data.AmphibianPhotosRepository
+import com.example.compose.network.AmphibiansDataClass
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 
-sealed interface MarsUiState {
-    data class Success(val photos: List<MarsPhoto>) : MarsUiState
-    object Error : MarsUiState
-    object Loading : MarsUiState
+sealed interface AmphibianUiState {
+    data class Success(val amphibians: List<AmphibiansDataClass>) : AmphibianUiState
+    object Error : AmphibianUiState
+    object Loading : AmphibianUiState
+
+    object Refreshing : AmphibianUiState
 }
 
 
-class MarsViewModel(private val marsPhotosRepository: MarsPhotosRepository) : ViewModel() {
+class AmphibianViewModel(private val amphibianPhotosRepository: AmphibianPhotosRepository) : ViewModel() {
     /** The mutable State that stores the status of the most recent request */
-    var marsUiState: MarsUiState by mutableStateOf(MarsUiState.Loading)
+    var marsUiState: AmphibianUiState by mutableStateOf(AmphibianUiState.Loading)
         private set
 
     /**
      * Call getMarsPhotos() on init so we can display status immediately.
      */
     init {
-        getMarsPhotos()
+        getAmphibians()
     }
 
     /**
      * Gets Mars photos information from the Mars API Retrofit service and updates the
      * [MarsPhoto] [List] [MutableList].
      */
-    fun getMarsPhotos() {
+    fun getAmphibians() {
         viewModelScope.launch {
             marsUiState = try {
-                val listResult = marsPhotosRepository.getMarsPhotos()
-                MarsUiState.Success(listResult)
+                val listResult = amphibianPhotosRepository.getAmphibians()
+                Log.d("MarsViewModel", "getAmphibians: $listResult")
+                AmphibianUiState.Success(listResult)
             } catch (e: IOException) {
-                MarsUiState.Error
+                AmphibianUiState.Error
+            }
+        }
+    }
+
+    fun isRefreshing():Boolean{
+        return when(marsUiState){
+            is AmphibianUiState.Refreshing -> true
+            else -> false
+        }
+    }
+
+    fun refetchAmphibians() {
+        viewModelScope.launch {
+            marsUiState = AmphibianUiState.Refreshing
+            marsUiState = try {
+                val listResult = amphibianPhotosRepository.getAmphibians()
+
+                AmphibianUiState.Success(listResult)
+            } catch (e: IOException) {
+                AmphibianUiState.Error
             }
         }
     }
@@ -67,8 +91,8 @@ class MarsViewModel(private val marsPhotosRepository: MarsPhotosRepository) : Vi
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MarsPhotosApplication)
-                val marsPhotosRepository = application.container.marsPhotosRepository
-                MarsViewModel(marsPhotosRepository = marsPhotosRepository)
+                val amphibiansPhotoRepository = application.container.amphibianPhotoRepository
+                AmphibianViewModel(amphibianPhotosRepository = amphibiansPhotoRepository)
             }
         }
     }

@@ -34,8 +34,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.R
+import com.example.compose.ui.screens.AmphibianViewModel
 import com.example.compose.ui.screens.HomeScreen
-import com.example.compose.ui.screens.MarsViewModel
+
 
 @Composable
 fun MarsPhotosApp() {
@@ -49,10 +50,12 @@ fun MarsPhotosApp() {
                 .fillMaxSize()
                 .padding(it)
         ) {
-            val marsViewModel: MarsViewModel =
-                viewModel(factory = MarsViewModel.Factory)
+            val amphibianUiModel: AmphibianViewModel =
+                viewModel(factory = AmphibianViewModel.Factory)
             HomeScreen(
-                marsUiState = marsViewModel.marsUiState)
+                amphibianUiState = amphibianUiModel.marsUiState,
+                amphibianViewModel= amphibianUiModel,
+            )
         }
     }
 }
@@ -63,7 +66,7 @@ fun MarsTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifier = 
         scrollBehavior = scrollBehavior,
         title = {
             Text(
-                text = stringResource(R.string.app_name),
+                text = stringResource(R.string.amphibian),
                 style = MaterialTheme.typography.headlineSmall,
             )
         },

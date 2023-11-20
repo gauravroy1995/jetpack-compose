@@ -19,10 +19,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,32 +33,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.compose.R
-import com.example.compose.network.MarsPhoto
+import com.example.compose.network.AmphibiansDataClass
+
+import com.example.compose.ui.components.AmphibianCard
+import com.example.compose.ui.components.ResultScreen
+
 
 @Composable
 fun HomeScreen(
-    marsUiState: MarsUiState, modifier: Modifier = Modifier
+    amphibianUiState: AmphibianUiState,amphibianViewModel:AmphibianViewModel, modifier: Modifier = Modifier
 ) {
-    when (marsUiState) {
-        is MarsUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is MarsUiState.Success -> ResultScreen(
-            marsUiState.photos, modifier = modifier.fillMaxWidth()
+    when (amphibianUiState) {
+        is AmphibianUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
+        is AmphibianUiState.Success -> ResultScreen(
+            amphibianUiState.amphibians,amphibianViewModel = amphibianViewModel, modifier = modifier.fillMaxWidth()
         )
-
-        is MarsUiState.Error -> ErrorScreen( modifier = modifier.fillMaxSize())
-    }
-}
-
-/**
- * ResultScreen displaying number of photos retrieved.
- */
-@Composable
-fun ResultScreen(photos: List<MarsPhoto>, modifier: Modifier = Modifier) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-    ) {
-       Text(text = "${photos.size} photos", modifier = Modifier.padding(16.dp))
+        is AmphibianUiState.Error -> ErrorScreen(modifier = modifier.fillMaxSize())
+        is AmphibianUiState.Refreshing -> LoadingScreen(modifier = modifier.fillMaxSize())
     }
 }
 
