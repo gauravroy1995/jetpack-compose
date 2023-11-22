@@ -5,6 +5,6 @@ import retrofit2.http.GET
 
 
 interface AmphibianApiService {
-    @GET("amphibians")
+    @GET("images/search?limit=10")
     suspend fun getAmphibians(): List<AmphibiansDataClass>
 }

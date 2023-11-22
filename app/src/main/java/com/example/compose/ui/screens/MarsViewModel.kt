@@ -80,7 +80,7 @@ class AmphibianViewModel(private val amphibianPhotosRepository: AmphibianPhotosR
             marsUiState = AmphibianUiState.Refreshing
             marsUiState = try {
                 val listResult = amphibianPhotosRepository.getAmphibians()
-
+                Log.d("MarsViewModel", "getAmphibians: $listResult")
                 AmphibianUiState.Success(listResult)
             } catch (e: IOException) {
                 AmphibianUiState.Error

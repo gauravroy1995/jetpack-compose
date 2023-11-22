@@ -23,21 +23,21 @@ import com.example.compose.network.AmphibiansDataClass
 @Composable
 fun AmphibianCard(imageData: AmphibiansDataClass) {
 
-    val ( name,type,description,imgSrc) = imageData
-
-    val finalText = "$name ($type)"
+//    val ( name,type,description,url) = imageData
+//
+//    val finalText = "$name ($type)"
 
     Card(shape = RoundedCornerShape(8.dp), elevation = CardDefaults.cardElevation(8.dp), modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
-        Text(text =finalText, modifier = Modifier.padding(start = 12.dp, bottom = 12.dp, top = 12.dp))
+//        Text(text =finalText, modifier = Modifier.padding(start = 12.dp, bottom = 12.dp, top = 12.dp))
         AsyncImage(
             model = ImageRequest.Builder(context = LocalContext.current)
-                .data(imageData.imgSrc)
+                .data(imageData.url)
                 .crossfade(true)
                 .build(), contentDescription = null, modifier = Modifier.fillMaxWidth(),
             placeholder = painterResource(id = R.drawable.loading_img),
             contentScale = ContentScale.FillWidth
         )
-        Text(text =description, textAlign = TextAlign.Justify, modifier = Modifier.padding(8.dp))
+//        Text(text =description, textAlign = TextAlign.Justify, modifier = Modifier.padding(8.dp))
     }
 
 
