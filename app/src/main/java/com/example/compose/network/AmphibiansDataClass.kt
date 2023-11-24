@@ -5,9 +5,35 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AmphibiansDataClass(
-    val name: String,
-    val type: String,
-    val description: String,
-    @SerialName(value = "img_src")
-    val imgSrc: String
+    val kind: String,
+    val totalItems: Int,
+    val items: List<ItemClass>,
+//    @SerialName(value = "img_src")
+//    val imgSrc: String
+)
+
+
+@Serializable
+data class ItemClass(
+    val id: String
+)
+
+
+@Serializable
+data class EachBookClass(
+
+    val volumeInfo: VolumeInfo,
+)
+
+
+@Serializable
+data class VolumeInfo(
+    val title: String,
+    val authors: List<String>,
+    val imageLinks: ImageLinks
+)
+
+@Serializable
+data class ImageLinks(
+    val thumbnail: String
 )

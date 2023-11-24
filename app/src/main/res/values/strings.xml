@@ -168,5 +168,7 @@
     <string name="progress_percentage">%1$d%%</string>
     <string name="player_one_name">Player 1</string>
     <string name="player_two_name">Player 2</string>
+    <string name="booklist">BookList</string>
+    <string name="book_details">Book Details</string>
 
 </resources>

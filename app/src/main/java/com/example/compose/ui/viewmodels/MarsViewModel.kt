@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.compose.ui.screens
+package com.example.compose.ui.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -26,13 +26,13 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.compose.MarsPhotosApplication
 import com.example.compose.data.AmphibianPhotosRepository
-import com.example.compose.network.AmphibiansDataClass
+import com.example.compose.network.EachBookClass
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 
 sealed interface AmphibianUiState {
-    data class Success(val amphibians: List<AmphibiansDataClass>) : AmphibianUiState
+    data class Success(val amphibians: List<EachBookClass>) : AmphibianUiState
     object Error : AmphibianUiState
     object Loading : AmphibianUiState
 
@@ -40,7 +40,8 @@ sealed interface AmphibianUiState {
 }
 
 
-class AmphibianViewModel(private val amphibianPhotosRepository: AmphibianPhotosRepository) : ViewModel() {
+class AmphibianViewModel(private val amphibianPhotosRepository: AmphibianPhotosRepository) :
+    ViewModel() {
     /** The mutable State that stores the status of the most recent request */
     var marsUiState: AmphibianUiState by mutableStateOf(AmphibianUiState.Loading)
         private set
@@ -58,18 +59,35 @@ class AmphibianViewModel(private val amphibianPhotosRepository: AmphibianPhotosR
      */
     fun getAmphibians() {
         viewModelScope.launch {
+
+            val bookList = mutableListOf<EachBookClass>()
+
             marsUiState = try {
                 val listResult = amphibianPhotosRepository.getAmphibians()
-                Log.d("MarsViewModel", "getAmphibians: $listResult")
-                AmphibianUiState.Success(listResult)
+//                Log.d("MarsViewModel", "getAmphibians: $listResult")
+
+                if (listResult.items.isNotEmpty()) {
+
+
+                    for (item in listResult.items) {
+                        val eachBook = amphibianPhotosRepository.getEachBook(item.id)
+                        bookList.add(eachBook)
+                        Log.d("MarsViewModel", "getEachBook: $eachBook")
+
+                    }
+                }
+
+                AmphibianUiState.Success(bookList)
+
+
             } catch (e: IOException) {
                 AmphibianUiState.Error
             }
         }
     }
 
-    fun isRefreshing():Boolean{
-        return when(marsUiState){
+    fun isRefreshing(): Boolean {
+        return when (marsUiState) {
             is AmphibianUiState.Refreshing -> true
             else -> false
         }
@@ -78,19 +96,22 @@ class AmphibianViewModel(private val amphibianPhotosRepository: AmphibianPhotosR
     fun refetchAmphibians() {
         viewModelScope.launch {
             marsUiState = AmphibianUiState.Refreshing
-            marsUiState = try {
-                val listResult = amphibianPhotosRepository.getAmphibians()
-
-                AmphibianUiState.Success(listResult)
-            } catch (e: IOException) {
-                AmphibianUiState.Error
-            }
+            //TODO
+//            marsUiState = try {
+//                val listResult = amphibianPhotosRepository.getAmphibians()
+//
+//                AmphibianUiState.Success(listResult.items)
+//            } catch (e: IOException) {
+//                AmphibianUiState.Error
+//            }
         }
     }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MarsPhotosApplication)
+                val application =
+                    (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MarsPhotosApplication)
                 val amphibiansPhotoRepository = application.container.amphibianPhotoRepository
                 AmphibianViewModel(amphibianPhotosRepository = amphibiansPhotoRepository)
             }

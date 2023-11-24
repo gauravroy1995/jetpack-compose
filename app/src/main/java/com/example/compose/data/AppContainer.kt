@@ -13,10 +13,12 @@ interface AppContainer {
 class DefaultAppContainer : AppContainer {
 
     private val baseUrl =
-        "https://android-kotlin-fun-mars-server.appspot.com/"
+        "https://www.googleapis.com/"
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory(Json {
+            ignoreUnknownKeys = true
+        }.asConverterFactory("application/json".toMediaType()))
         .baseUrl(baseUrl)
         .build()
 
