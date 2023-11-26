@@ -33,7 +33,7 @@ fun ResultScreen(photos: List<EachBookClass>, amphibianViewModel: AmphibianViewM
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(start = 12.dp, end = 12.dp)
+            contentPadding = PaddingValues(start = 0.dp, end = 0.dp)
         ) {
             items(photos.size) { index ->
                 AmphibianCard(imageData = photos[index],navController = navController)

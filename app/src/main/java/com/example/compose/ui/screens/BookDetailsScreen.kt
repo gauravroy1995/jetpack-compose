@@ -1,7 +1,20 @@
 package com.example.compose.ui.screens
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +40,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,73 +66,112 @@ import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.example.compose.R
 import com.example.compose.network.EachBookClass
+import com.example.compose.ui.theme.darkModeGradientColors
+import com.example.compose.ui.theme.lightModeGradientColors
 import kotlinx.serialization.json.Json
 
 @Composable
 fun BookDetailsScreen(book: String) {
 
-    val bookObject: EachBookClass? = SharedUserViewModelComposition.current.currentSetBook.value
+    val bookObjectDirect =  SharedUserViewModelComposition.current.currentSetBook.value
+    val bookObject: EachBookClass? = remember {
+        bookObjectDirect
+    }
+
+
 
     Log.d(
         "BookDetailsScreen",
         "BookDetailsScreen: ${SharedUserViewModelComposition.current.currentSetBook}"
     )
     if (bookObject != null) {
-        BookDetailsContent(bookObject = bookObject)
+
+            BookDetailsContent(bookObject = bookObject)
+
+
     }
 
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 private fun BookDetailsContent(bookObject: EachBookClass) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF6200EA),
-                        Color(0xFF3700B3),
+
+    val visibleState = remember {
+        MutableTransitionState(false).apply {
+            // Start the animation immediately.
+            targetState = true
+        }
+    }
+
+    val gradientColors: List<Color> = if (isSystemInDarkTheme()) {
+        darkModeGradientColors
+    } else {
+        lightModeGradientColors
+    }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+    val density = LocalDensity.current
+    val animatedColor by infiniteTransition.animateColor(
+        initialValue = Color(0xFF60DDAD),
+        targetValue = Color(0xFF4285F4),
+        animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse),
+        label = "color"
+    )
+
+    AnimatedVisibility(visibleState = visibleState,
+        ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = gradientColors
                     )
                 )
-            )
-    ) {
-
-
-        // Display Book Cover Image using Coil
-        CoilImage(
-            data = bookObject.volumeInfo.imageLinks.thumbnail,
-            contentDescription = null,
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth()
-                .clip(shape = RoundedCornerShape(8.dp))
-        )
-
-        // Display Book Title
-        Text(
-            text = bookObject.volumeInfo.title,
-
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        // Display Authors
-        AuthorsList(authors = bookObject.volumeInfo.authors)
-
-        // Placeholder for other book details
-        // ...
-
-        // Like and Visibility icons (for demonstration)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconWithText(icon = Icons.Default.ThumbUp, text = "120 Likes")
-            IconWithText(icon = Icons.Default.Visibility, text = "320 Views")
+
+
+            // Display Book Cover Image using Coil
+            CoilImage(
+                data = bookObject.volumeInfo.imageLinks.thumbnail,
+                contentDescription = null,
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(8.dp))
+                    .animateEnterExit(
+                    // Slide in/out the inner box.
+                    enter = slideInVertically(),
+                    exit = slideOutVertically()
+                )
+            )
+
+            // Display Book Title
+            Text(
+                text = bookObject.volumeInfo.title,
+                fontSize = 24.sp,
+                color=animatedColor,
+                modifier = Modifier.padding(vertical = 28.dp, horizontal = 16.dp),
+            )
+
+            // Display Authors
+            AuthorsList(authors = bookObject.volumeInfo.authors)
+
+            // Placeholder for other book details
+            // ...
+
+            // Like and Visibility icons (for demonstration)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconWithText(icon = Icons.Default.ThumbUp, text = "120 Likes")
+                IconWithText(icon = Icons.Default.Visibility, text = "320 Views")
+            }
         }
     }
 }
@@ -128,13 +184,13 @@ private fun AuthorsList(authors: List<String>) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp),
+                .padding(vertical = 4.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.surface,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .size(20.dp)
                     .padding(end = 8.dp)
@@ -180,9 +236,12 @@ private fun CoilImage(
             .data(data)
             .crossfade(true)
             .build(),
-        contentDescription = null, modifier = Modifier.fillMaxWidth().height(500.dp),
+        contentDescription = null, modifier = Modifier
+            .fillMaxWidth()
+            .height(500.dp).padding(top = 20.dp, start = 20.dp, end = 20.dp).clip(shape = RoundedCornerShape(8.dp))
+        ,
         placeholder = painterResource(id = R.drawable.loading_img),
-        contentScale = ContentScale.Fit,
+        contentScale = ContentScale.FillWidth,
 
         )
 }

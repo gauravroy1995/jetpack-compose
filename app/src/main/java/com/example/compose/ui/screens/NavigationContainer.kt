@@ -138,7 +138,9 @@ fun QuizNavigation(
                     })
                 ) {
                     val book = backStackEntry?.arguments?.getString("book") ?: "booksss"
-                    BookDetailsScreen(book)
+
+
+                    BookDetailsScreen(book, )
                 }
             }
         }

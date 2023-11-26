@@ -25,3 +25,20 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+val darkModeGradientColors = listOf(
+    Color(0xFF6650a4), // Darkest (Deep Purple)
+    Color(0xFF000000)  // Lightest
+)
+
+
+val lightModeGradientColors = listOf(
+    Color(0xFFE0E0E0), // Lightest
+    Color(0xFFCCCCCC), // Lighter
+    Color(0xFFB3B3B3), // Light
+    Color(0xFF999999), // Base (similar to your original color)
+    Color(0xFF808080), // Dark
+    Color(0xFF666666), // Darker
+    Color(0xFF474747), // Darkest
+)
+
