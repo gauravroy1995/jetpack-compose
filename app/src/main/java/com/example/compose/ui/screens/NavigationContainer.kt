@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -90,7 +91,7 @@ fun QuizNavigation(
     val backStackEntry by navController.currentBackStackEntryAsState()
 
     // shared view model
-    val sharedViewModel = remember {SharedViewModel()}
+    val sharedViewModel:SharedViewModel = viewModel()
 
 
 
