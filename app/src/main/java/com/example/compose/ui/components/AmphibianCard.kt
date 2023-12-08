@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.compose.R
+import com.example.compose.database.EachBookEntity
 import com.example.compose.network.AmphibiansDataClass
 import com.example.compose.network.EachBookClass
 import com.example.compose.network.ItemClass
@@ -30,7 +31,7 @@ import kotlinx.serialization.json.Json
 
 
 @Composable
-fun AmphibianCard(imageData: EachBookClass,navController: NavHostController = rememberNavController()) {
+fun AmphibianCard(imageData: EachBookEntity,navController: NavHostController = rememberNavController()) {
 
 
     val viewModel = SharedUserViewModelComposition.current
@@ -50,11 +51,9 @@ fun AmphibianCard(imageData: EachBookClass,navController: NavHostController = re
 
     Card(shape = RoundedCornerShape(8.dp), elevation = CardDefaults.cardElevation(8.dp), modifier = newModifier) {
 
+        val imgLink = imageData.thumbnail
         AsyncImage(
-            model = ImageRequest.Builder(context = LocalContext.current)
-                .data(imageData.volumeInfo.imageLinks.thumbnail)
-                .crossfade(true)
-                .build(), contentDescription = null, modifier = Modifier.fillMaxWidth(),
+            model = imgLink, contentDescription = null, modifier = Modifier.fillMaxWidth(),
             placeholder = painterResource(id = R.drawable.loading_img),
             contentScale = ContentScale.FillWidth,
 

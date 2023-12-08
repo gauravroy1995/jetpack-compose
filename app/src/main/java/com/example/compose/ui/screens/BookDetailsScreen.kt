@@ -63,8 +63,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.compose.R
+import com.example.compose.database.EachBookEntity
 import com.example.compose.network.EachBookClass
 import com.example.compose.ui.theme.darkModeGradientColors
 import com.example.compose.ui.theme.lightModeGradientColors
@@ -74,7 +76,7 @@ import kotlinx.serialization.json.Json
 fun BookDetailsScreen(book: String) {
 
     val bookObjectDirect =  SharedUserViewModelComposition.current.currentSetBook.value
-    val bookObject: EachBookClass? = remember {
+    val bookObject: EachBookEntity? = remember {
         bookObjectDirect
     }
 
@@ -96,7 +98,7 @@ fun BookDetailsScreen(book: String) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-private fun BookDetailsContent(bookObject: EachBookClass) {
+private fun BookDetailsContent(bookObject: EachBookEntity) {
 
     val visibleState = remember {
         MutableTransitionState(false).apply {
@@ -135,7 +137,7 @@ private fun BookDetailsContent(bookObject: EachBookClass) {
 
             // Display Book Cover Image using Coil
             CoilImage(
-                data = bookObject.volumeInfo.imageLinks.thumbnail,
+                data = bookObject.thumbnail,
                 contentDescription = null,
                 modifier = Modifier
                     .height(200.dp)
@@ -150,14 +152,14 @@ private fun BookDetailsContent(bookObject: EachBookClass) {
 
             // Display Book Title
             Text(
-                text = bookObject.volumeInfo.title,
+                text = bookObject.title,
                 fontSize = 24.sp,
                 color=animatedColor,
                 modifier = Modifier.padding(vertical = 28.dp, horizontal = 16.dp),
             )
 
             // Display Authors
-            AuthorsList(authors = bookObject.volumeInfo.authors)
+            AuthorsList(authors = bookObject.authors)
 
             // Placeholder for other book details
             // ...
@@ -232,10 +234,8 @@ private fun CoilImage(
     modifier: Modifier = Modifier
 ) {
     AsyncImage(
-        model = ImageRequest.Builder(context = LocalContext.current)
-            .data(data)
-            .crossfade(true)
-            .build(),
+        model = data,
+
         contentDescription = null, modifier = Modifier
             .fillMaxWidth()
             .height(500.dp).padding(top = 20.dp, start = 20.dp, end = 20.dp).clip(shape = RoundedCornerShape(8.dp))

@@ -26,13 +26,19 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.compose.MarsPhotosApplication
 import com.example.compose.data.AmphibianPhotosRepository
+import com.example.compose.data.BooksDataRepository
+import com.example.compose.data.convertApiToEachBookData
+import com.example.compose.database.EachBookEntity
 import com.example.compose.network.EachBookClass
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 
 sealed interface AmphibianUiState {
-    data class Success(val amphibians: List<EachBookClass>) : AmphibianUiState
+    data class Success(val amphibians: List<EachBookEntity>) : AmphibianUiState
     object Error : AmphibianUiState
     object Loading : AmphibianUiState
 
@@ -40,48 +46,72 @@ sealed interface AmphibianUiState {
 }
 
 
-class AmphibianViewModel(private val amphibianPhotosRepository: AmphibianPhotosRepository) :
-    ViewModel() {
+class AmphibianViewModel(
+    private val amphibianPhotosRepository: AmphibianPhotosRepository,
+    private val booksDataRepository: BooksDataRepository
+) : ViewModel() {
     /** The mutable State that stores the status of the most recent request */
     var marsUiState: AmphibianUiState by mutableStateOf(AmphibianUiState.Loading)
         private set
+
+    private val _booksListInDB = MutableStateFlow<List<EachBookEntity>>(emptyList())
+    val booksListInDB: StateFlow<List<EachBookEntity>> get() = _booksListInDB
 
     /**
      * Call getMarsPhotos() on init so we can display status immediately.
      */
     init {
-        getAmphibians()
+        observeBooksListInDB()
+//        getAmphibians()
+    }
+
+    /**
+     * Observes changes in the local database and updates [_booksListInDB].
+     */
+    private fun observeBooksListInDB() {
+        viewModelScope.launch {
+            booksDataRepository.getAllItemsStream().collect { items ->
+                Log.d("AmphibianViewModel", "ywhyhyh: called $items")
+                _booksListInDB.value = items
+                marsUiState = AmphibianUiState.Success(items)
+                if (items.size == 0) {
+
+                    getAmphibians(0)
+                }
+
+            }
+        }
     }
 
     /**
      * Gets Mars photos information from the Mars API Retrofit service and updates the
      * [MarsPhoto] [List] [MutableList].
      */
-    fun getAmphibians() {
+    fun getAmphibians(startIndexForApi:Int) {
         viewModelScope.launch {
 
-            val bookList = mutableListOf<EachBookClass>()
 
-            marsUiState = try {
-                val listResult = amphibianPhotosRepository.getAmphibians()
-//                Log.d("MarsViewModel", "getAmphibians: $listResult")
-
+            try {
+                val listResult = amphibianPhotosRepository.getAmphibians(startIndexForApi)
+                Log.d("AmphibianViewModel", "getAmphibians: ${listResult.items.size}")
                 if (listResult.items.isNotEmpty()) {
-
 
                     for (item in listResult.items) {
                         val eachBook = amphibianPhotosRepository.getEachBook(item.id)
-                        bookList.add(eachBook)
-                        Log.d("MarsViewModel", "getEachBook: $eachBook")
+
+                        val eachBookEntity = convertApiToEachBookData(eachBook)
+
+                        booksDataRepository.insertItem(eachBookEntity)
+
 
                     }
                 }
 
-                AmphibianUiState.Success(bookList)
 
 
             } catch (e: IOException) {
-                AmphibianUiState.Error
+                marsUiState = AmphibianUiState.Error
+                Log.e("MarsViewModel", "getAmphibians: $e")
             }
         }
     }
@@ -93,17 +123,22 @@ class AmphibianViewModel(private val amphibianPhotosRepository: AmphibianPhotosR
         }
     }
 
+    fun onLoadMore(){
+        getAmphibians(_booksListInDB.value.size)
+    }
+
+    fun deleteAll() {
+        viewModelScope.launch {
+            booksDataRepository.deleteAll()
+        }
+    }
+
     fun refetchAmphibians() {
         viewModelScope.launch {
-            marsUiState = AmphibianUiState.Refreshing
-            //TODO
-//            marsUiState = try {
-//                val listResult = amphibianPhotosRepository.getAmphibians()
-//
-//                AmphibianUiState.Success(listResult.items)
-//            } catch (e: IOException) {
-//                AmphibianUiState.Error
-//            }
+//            marsUiState = AmphibianUiState.Refreshing
+            delay(2000)
+            marsUiState = AmphibianUiState.Success(_booksListInDB.value)
+
         }
     }
 
@@ -113,7 +148,11 @@ class AmphibianViewModel(private val amphibianPhotosRepository: AmphibianPhotosR
                 val application =
                     (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MarsPhotosApplication)
                 val amphibiansPhotoRepository = application.container.amphibianPhotoRepository
-                AmphibianViewModel(amphibianPhotosRepository = amphibiansPhotoRepository)
+                val booksDataRepository = application.container.booksDataRepository
+                AmphibianViewModel(
+                    amphibianPhotosRepository = amphibiansPhotoRepository,
+                    booksDataRepository = booksDataRepository
+                )
             }
         }
     }

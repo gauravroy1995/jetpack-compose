@@ -21,19 +21,31 @@ data class ItemClass(
 
 @Serializable
 data class EachBookClass(
-
+    val id: String,
     val volumeInfo: VolumeInfo,
+    val saleInfo: SaleInfo
 )
 
+
+@Serializable
+data class SaleInfo(
+    val listPrice: ListPrice? = null
+)
+
+@Serializable
+data class ListPrice(
+    val amount: Double? = 0.0
+)
 
 @Serializable
 data class VolumeInfo(
     val title: String,
     val authors: List<String>,
-    val imageLinks: ImageLinks
+    val imageLinks: ImageLinks? = null,
+    val publishedDate: String? = "Unknown"
 )
 
 @Serializable
 data class ImageLinks(
-    val thumbnail: String
+    val thumbnail: String?=""
 )

@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.compose.ui.viewmodels.AmphibianViewModel
 import com.example.compose.ui.screens.HomeScreen
 
@@ -38,12 +39,15 @@ import com.example.compose.ui.screens.HomeScreen
 fun MarsPhotosApp(navController: NavHostController = rememberNavController()) {
 
 
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
     ) {
         val amphibianUiModel: AmphibianViewModel =
             viewModel(factory = AmphibianViewModel.Factory)
+
+        
         HomeScreen(
             amphibianUiState = amphibianUiModel.marsUiState,
             amphibianViewModel = amphibianUiModel,
