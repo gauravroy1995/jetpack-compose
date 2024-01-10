@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">GeminiStarter</string>
+    <string name="action_go">Go</string>
+    <string name="summarize_label">Text to summarize</string>
+    <string name="summarize_hint">Enter text or a URL to summarize</string>
+    <string name="normal_search">Try this model if you want to search or ask about something,</string>
+    <string name="normal_search_title">Normal Search</string>
+    <string name="nutri_search_title">Nutri Value Search</string>
+    <string name="basic_default">Try this if you want to know like - </string>
+
+    <string name="action_try">Try it</string>
+
+    <string name="menu_summarize_title">Generate text from text-only input</string>
+    <string name="menu_summarize_description">Sample app that summarizes text</string>
+    <string name="menu_reason_title">Generate text from text-and-image input (multimodal)</string>
+    <string name="menu_reason_description">Sample app for uploading images and asking about them</string>
+    <string name="menu_chat_title">Build multi-turn conversations (chat)</string>
+    <string name="menu_chat_description">Sample app demonstrating a conversational UI</string>
+
+
+
+    <!-- Photo Reasoning sample strings -->
+    <string name="reason_label">Question</string>
+    <string name="reason_hint">Upload an image and then ask a question</string>
+    <string name="add_image">Add Image</string>
+
+    <!-- Chat sample strings -->
+    <string name="chat_label">Message</string>
+    <string name="action_send">Send</string>
+</resources>
